@@ -9,16 +9,19 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.lykimq_uyen.french_nationality.core.ui.components.AppGradientBackground
 import com.lykimq_uyen.french_nationality.core.ui.components.ErrorContent
 import com.lykimq_uyen.french_nationality.core.ui.components.LoadingContent
+import com.lykimq_uyen.french_nationality.feature.home.domain.model.Category
 import com.lykimq_uyen.french_nationality.feature.home.presentation.components.CategoryListContent
 
 @Composable
 fun HomeScreen(
+    onCategoryClick: (Category) -> Unit = {},
     viewModel: HomeViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
     HomeScreenContent(
         uiState = uiState,
+        onCategoryClick = onCategoryClick,
         modifier = Modifier.fillMaxSize(),
     )
 }
@@ -26,6 +29,7 @@ fun HomeScreen(
 @Composable
 private fun HomeScreenContent(
     uiState: HomeUiState,
+    onCategoryClick: (Category) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     when (uiState) {
@@ -41,6 +45,7 @@ private fun HomeScreenContent(
         is HomeUiState.Success -> {
             CategoryListContent(
                 categories = uiState.categories,
+                onCategoryClick = onCategoryClick,
                 modifier = modifier,
             )
         }

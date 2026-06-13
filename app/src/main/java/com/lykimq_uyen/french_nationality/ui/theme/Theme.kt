@@ -6,6 +6,7 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import com.lykimq_uyen.french_nationality.core.ui.SystemBarsEffect
 
 private val LightColors = lightColorScheme(
     primary = ElectricIndigo,
@@ -52,6 +53,8 @@ fun FrenchNationalityTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit,
 ) {
+    SystemBarsEffect(darkTheme = darkTheme)
+
     MaterialTheme(
         colorScheme = if (darkTheme) DarkColors else LightColors,
         typography = AppTypography,

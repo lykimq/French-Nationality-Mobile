@@ -1,14 +1,34 @@
 package com.lykimq_uyen.french_nationality.core.di
 
 import android.content.Context
+import com.lykimq_uyen.french_nationality.core.progress.StudyProgressRepository
+import com.lykimq_uyen.french_nationality.core.progress.StudyProgressRepositoryImpl
 import com.lykimq_uyen.french_nationality.data.db.AppDatabase
 import com.lykimq_uyen.french_nationality.feature.home.data.CategoryRepositoryImpl
 import com.lykimq_uyen.french_nationality.feature.home.domain.repository.CategoryRepository
+import com.lykimq_uyen.french_nationality.feature.question.data.QuestionRepositoryImpl
+import com.lykimq_uyen.french_nationality.feature.question.domain.repository.QuestionRepository
+import com.lykimq_uyen.french_nationality.feature.subcategory.data.SubCategoryRepositoryImpl
+import com.lykimq_uyen.french_nationality.feature.subcategory.domain.repository.SubCategoryRepository
 
 object AppContainer {
 
     fun categoryRepository(context: Context): CategoryRepository {
         val dao = AppDatabase.getInstance(context).categoryDao()
         return CategoryRepositoryImpl(dao)
+    }
+
+    fun subCategoryRepository(context: Context): SubCategoryRepository {
+        val dao = AppDatabase.getInstance(context).subCategoryDao()
+        return SubCategoryRepositoryImpl(dao)
+    }
+
+    fun questionRepository(context: Context): QuestionRepository {
+        val dao = AppDatabase.getInstance(context).questionDao()
+        return QuestionRepositoryImpl(dao)
+    }
+
+    fun studyProgressRepository(context: Context): StudyProgressRepository {
+        return StudyProgressRepositoryImpl(context)
     }
 }
