@@ -156,6 +156,11 @@ fun QuestionListContent(
                 showJumpSheet = false
                 onJumpToNumber(number)
             },
+            searchItems = items,
+            onSelectQuestion = { item ->
+                showJumpSheet = false
+                onQuestionClick(item)
+            },
             onSelectChunk = if (isLargeList && chunks.isNotEmpty()) {
                 { chunk ->
                     selectedChunkIndex = chunks.indexOfFirst {
@@ -202,7 +207,7 @@ private fun QuestionListTopBar(
                         contentDescription = null,
                         modifier = Modifier.padding(end = 4.dp),
                     )
-                    Text("Aller à #")
+                    Text("Rechercher")
                 }
             }
         },
@@ -226,9 +231,9 @@ private fun QuestionListSectionHeader(
         )
         Text(
             text = if (isLargeList) {
-                "$totalQuestions questions en blocs de 25. Utilise les flèches ou « Aller à # »."
+                "$totalQuestions questions en blocs de 25. Utilise les flèches ou « Rechercher »."
             } else {
-                "$totalQuestions questions. Choisis-en une pour commencer."
+                "$totalQuestions questions. Choisis-en une ou utilise « Rechercher »."
             },
             modifier = Modifier.padding(top = 8.dp),
             style = MaterialTheme.typography.bodyMedium,
