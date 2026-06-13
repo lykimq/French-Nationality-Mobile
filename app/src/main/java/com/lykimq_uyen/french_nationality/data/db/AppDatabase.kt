@@ -7,6 +7,7 @@ import androidx.room.RoomDatabase
 import com.lykimq_uyen.french_nationality.data.db.dao.CategoryDao
 import com.lykimq_uyen.french_nationality.data.db.dao.DbMetaDao
 import com.lykimq_uyen.french_nationality.data.db.dao.QuestionDao
+import com.lykimq_uyen.french_nationality.data.db.dao.SubCategoryDao
 import com.lykimq_uyen.french_nationality.data.db.entity.AnswerEntity
 import com.lykimq_uyen.french_nationality.data.db.entity.CategoryEntity
 import com.lykimq_uyen.french_nationality.data.db.entity.DbMetaEntity
@@ -26,6 +27,7 @@ import com.lykimq_uyen.french_nationality.data.db.entity.SubCategoryEntity
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun categoryDao(): CategoryDao
+    abstract fun subCategoryDao(): SubCategoryDao
     abstract fun questionDao(): QuestionDao
     abstract fun dbMetaDao(): DbMetaDao
 

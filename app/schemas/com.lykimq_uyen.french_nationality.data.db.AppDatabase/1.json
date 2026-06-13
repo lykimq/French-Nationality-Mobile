@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "229d65893a7a947c78fecbbdbe3f5817",
+    "identityHash": "0246cb9ae5668c572e4b8babdcb8a728",
     "entities": [
       {
         "tableName": "categories",
@@ -88,7 +88,7 @@
       },
       {
         "tableName": "questions",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `category_id` TEXT NOT NULL, `sub_category_id` TEXT, `question` TEXT NOT NULL, `explanation` TEXT NOT NULL, `image_path` TEXT, `source` TEXT NOT NULL, `question_type` TEXT, `sort_order` INTEGER NOT NULL, `content_fingerprint` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `category_id` TEXT NOT NULL, `sub_category_id` TEXT NOT NULL, `question` TEXT NOT NULL, `explanation` TEXT NOT NULL, `image_path` TEXT, `source` TEXT NOT NULL, `question_type` TEXT, `sort_order` INTEGER NOT NULL, `content_fingerprint` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -106,7 +106,7 @@
             "fieldPath": "sub_category_id",
             "columnName": "sub_category_id",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           },
           {
             "fieldPath": "question",
@@ -167,6 +167,15 @@
             ],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `idx_questions_category` ON `${TABLE_NAME}` (`category_id`, `source`)"
+          },
+          {
+            "name": "idx_questions_sub_category",
+            "unique": false,
+            "columnNames": [
+              "sub_category_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `idx_questions_sub_category` ON `${TABLE_NAME}` (`sub_category_id`)"
           },
           {
             "name": "idx_questions_fingerprint",
@@ -258,7 +267,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '229d65893a7a947c78fecbbdbe3f5817')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0246cb9ae5668c572e4b8babdcb8a728')"
     ]
   }
 }

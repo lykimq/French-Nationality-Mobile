@@ -1,10 +1,8 @@
-.PHONY: install dev apk db clean test check-device
+.PHONY: install dev apk clean test check-device
 
 PACKAGE  := com.lykimq_uyen.french_nationality
 ACTIVITY := $(PACKAGE)/.MainActivity
 GRADLE   := ./gradlew
-DB_ASSET := app/src/main/assets/database/french_questions.db
-OLD_REPO := /home/quyen/French_nationality_questions
 
 # Prefer physical phone over emulator; override with ANDROID_SERIAL=<id>
 ADB_DEVICE := $(if $(ANDROID_SERIAL),$(ANDROID_SERIAL),$(shell adb devices 2>/dev/null | awk '/device$$/ && !/^emulator-/ {print $$1; exit}'))
@@ -40,12 +38,6 @@ dev: check-device
 apk:
 	$(GRADLE) assembleDebug
 	@echo "APK: app/build/outputs/apk/debug/app-debug.apk"
-
-db:
-	cd $(OLD_REPO) && node scripts/seedDatabase.js
-	@mkdir -p app/src/main/assets/database
-	cp $(OLD_REPO)/french_questions.db $(DB_ASSET)
-	@echo "Updated $(DB_ASSET)"
 
 clean:
 	$(GRADLE) clean
