@@ -2,6 +2,7 @@ package com.lykimq_uyen.french_nationality.core.navigation
 
 object AppRoutes {
     const val HOME = "home"
+    const val SETTINGS = "settings"
     const val SUB_CATEGORIES = "sub_categories/{categoryId}"
     const val QUESTIONS = "questions/{categoryId}/{subCategoryId}"
     const val QUESTION_STUDY = "study/{categoryId}/{subCategoryId}/{questionId}"

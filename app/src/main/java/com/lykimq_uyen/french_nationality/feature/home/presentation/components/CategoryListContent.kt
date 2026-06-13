@@ -11,7 +11,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -37,6 +41,7 @@ import com.lykimq_uyen.french_nationality.ui.theme.VividViolet
 fun CategoryListContent(
     categories: List<Category>,
     onCategoryClick: (Category) -> Unit = {},
+    onSettingsClick: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
@@ -52,6 +57,7 @@ fun CategoryListContent(
                 HomeTopBar(
                     categoryCount = categories.size,
                     scrollBehavior = scrollBehavior,
+                    onSettingsClick = onSettingsClick,
                 )
             },
         ) { innerPadding ->
@@ -90,6 +96,7 @@ fun CategoryListContent(
 private fun HomeTopBar(
     categoryCount: Int,
     scrollBehavior: androidx.compose.material3.TopAppBarScrollBehavior,
+    onSettingsClick: () -> Unit,
 ) {
     LargeTopAppBar(
         title = {
@@ -103,6 +110,14 @@ private fun HomeTopBar(
                     overflow = TextOverflow.Ellipsis,
                 )
                 ThemeCountPill(count = categoryCount)
+            }
+        },
+        actions = {
+            IconButton(onClick = onSettingsClick) {
+                Icon(
+                    imageVector = Icons.Outlined.Settings,
+                    contentDescription = "Paramètres",
+                )
             }
         },
         scrollBehavior = scrollBehavior,

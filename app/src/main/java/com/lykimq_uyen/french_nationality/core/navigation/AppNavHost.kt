@@ -13,6 +13,7 @@ import androidx.navigation.navArgument
 import com.lykimq_uyen.french_nationality.feature.home.presentation.HomeScreen
 import com.lykimq_uyen.french_nationality.feature.question.presentation.QuestionListScreen
 import com.lykimq_uyen.french_nationality.feature.question.presentation.QuestionStudyScreen
+import com.lykimq_uyen.french_nationality.feature.settings.presentation.SettingsScreen
 import com.lykimq_uyen.french_nationality.feature.subcategory.presentation.SubCategoryListScreen
 
 @Composable
@@ -34,6 +35,15 @@ fun AppNavHost(
                 onCategoryClick = { category ->
                     navController.navigate(AppRoutes.subCategories(category.id))
                 },
+                onSettingsClick = {
+                    navController.navigate(AppRoutes.SETTINGS)
+                },
+            )
+        }
+
+        composable(route = AppRoutes.SETTINGS) {
+            SettingsScreen(
+                onBackClick = { navController.popBackStack() },
             )
         }
 

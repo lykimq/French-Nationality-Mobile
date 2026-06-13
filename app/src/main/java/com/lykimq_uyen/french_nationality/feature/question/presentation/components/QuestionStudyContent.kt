@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -29,6 +30,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -40,6 +43,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.lykimq_uyen.french_nationality.core.speech.rememberFrenchSpeechController
 import com.lykimq_uyen.french_nationality.core.ui.components.AppGradientBackground
 import com.lykimq_uyen.french_nationality.core.ui.modifier.horizontalSwipeNavigation
 import com.lykimq_uyen.french_nationality.feature.home.domain.model.Category
@@ -64,9 +68,15 @@ fun QuestionStudyContent(
     modifier: Modifier = Modifier,
 ) {
     val visual = categoryVisual(category.iconKey)
+    val speechController = rememberFrenchSpeechController()
+    val isSpeechReady by speechController.isReady.collectAsState()
     var showJumpSheet by remember { mutableStateOf(false) }
     val chunks = remember(totalQuestions) {
         buildJumpChunks(totalQuestions)
+    }
+
+    LaunchedEffect(currentItem.question.id) {
+        speechController.stop()
     }
 
     AppGradientBackground(modifier = modifier) {
@@ -117,10 +127,16 @@ fun QuestionStudyContent(
                     StudyTextCard(
                         title = "Question",
                         body = currentItem.question.question,
+                        speakEnabled = isSpeechReady,
+                        speakContentDescription = "Lire la question",
+                        onSpeakClick = { speechController.speak(currentItem.question.question) },
                     )
                     StudyTextCard(
                         title = "Explication",
                         body = currentItem.question.explanation,
+                        speakEnabled = isSpeechReady,
+                        speakContentDescription = "Lire l'explication",
+                        onSpeakClick = { speechController.speak(currentItem.question.explanation) },
                     )
                 }
             }
@@ -255,6 +271,9 @@ private fun QuestionNumberBadge(
 private fun StudyTextCard(
     title: String,
     body: String,
+    speakEnabled: Boolean,
+    speakContentDescription: String,
+    onSpeakClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -267,14 +286,34 @@ private fun StudyTextCard(
                 .fillMaxWidth()
                 .padding(18.dp),
         ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                IconButton(
+                    onClick = onSpeakClick,
+                    enabled = speakEnabled,
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.VolumeUp,
+                        contentDescription = speakContentDescription,
+                        tint = if (speakEnabled) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.outline
+                        },
+                    )
+                }
+            }
             Text(
                 text = body,
-                modifier = Modifier.padding(top = 10.dp),
+                modifier = Modifier.padding(top = 4.dp),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurface,
             )

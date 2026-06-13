@@ -3,6 +3,9 @@ package com.lykimq_uyen.french_nationality.core.di
 import android.content.Context
 import com.lykimq_uyen.french_nationality.core.progress.StudyProgressRepository
 import com.lykimq_uyen.french_nationality.core.progress.StudyProgressRepositoryImpl
+import com.lykimq_uyen.french_nationality.core.speech.FrenchSpeechController
+import com.lykimq_uyen.french_nationality.core.speech.SpeechPreferencesRepository
+import com.lykimq_uyen.french_nationality.core.speech.SpeechPreferencesRepositoryImpl
 import com.lykimq_uyen.french_nationality.data.db.AppDatabase
 import com.lykimq_uyen.french_nationality.feature.home.data.CategoryRepositoryImpl
 import com.lykimq_uyen.french_nationality.feature.home.domain.repository.CategoryRepository
@@ -30,5 +33,25 @@ object AppContainer {
 
     fun studyProgressRepository(context: Context): StudyProgressRepository {
         return StudyProgressRepositoryImpl(context)
+    }
+
+    fun speechPreferencesRepository(context: Context): SpeechPreferencesRepository {
+        return SpeechPreferencesRepositoryImpl(context)
+    }
+
+    @Volatile
+    private var speechController: FrenchSpeechController? = null
+
+    fun frenchSpeechController(context: Context): FrenchSpeechController {
+        val existing = speechController
+        if (existing != null) {
+            return existing
+        }
+        return synchronized(this) {
+            speechController ?: FrenchSpeechController(
+                context = context,
+                speechPreferencesRepository = speechPreferencesRepository(context),
+            ).also { speechController = it }
+        }
     }
 }

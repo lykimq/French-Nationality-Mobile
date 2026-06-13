@@ -15,6 +15,7 @@ import com.lykimq_uyen.french_nationality.feature.home.presentation.components.C
 @Composable
 fun HomeScreen(
     onCategoryClick: (Category) -> Unit = {},
+    onSettingsClick: () -> Unit = {},
     viewModel: HomeViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -22,6 +23,7 @@ fun HomeScreen(
     HomeScreenContent(
         uiState = uiState,
         onCategoryClick = onCategoryClick,
+        onSettingsClick = onSettingsClick,
         modifier = Modifier.fillMaxSize(),
     )
 }
@@ -30,6 +32,7 @@ fun HomeScreen(
 private fun HomeScreenContent(
     uiState: HomeUiState,
     onCategoryClick: (Category) -> Unit,
+    onSettingsClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     when (uiState) {
@@ -46,6 +49,7 @@ private fun HomeScreenContent(
             CategoryListContent(
                 categories = uiState.categories,
                 onCategoryClick = onCategoryClick,
+                onSettingsClick = onSettingsClick,
                 modifier = modifier,
             )
         }
