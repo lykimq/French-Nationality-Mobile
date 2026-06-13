@@ -69,10 +69,7 @@ fun CategoryListContent(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 item(key = "section_header") {
-                    HomeSectionHeader(
-                        categoryCount = categories.size,
-                        modifier = Modifier.animateItem(),
-                    )
+                    HomeSectionHeader(categoryCount = categories.size)
                 }
                 items(
                     items = categories,
@@ -81,7 +78,6 @@ fun CategoryListContent(
                     CategoryCard(
                         category = category,
                         onClick = { onCategoryClick(category) },
-                        modifier = Modifier.animateItem(),
                     )
                 }
             }

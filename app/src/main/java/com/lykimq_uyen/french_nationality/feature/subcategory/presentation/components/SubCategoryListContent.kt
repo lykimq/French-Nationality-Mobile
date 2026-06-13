@@ -83,7 +83,6 @@ fun SubCategoryListContent(
                 item(key = "section_header") {
                     SubCategorySectionHeader(
                         subCategoryCount = subCategories.size,
-                        modifier = Modifier.animateItem(),
                     )
                 }
                 items(
@@ -94,7 +93,6 @@ fun SubCategoryListContent(
                         subCategory = subCategory,
                         visual = visual,
                         onClick = { onSubCategoryClick(subCategory) },
-                        modifier = Modifier.animateItem(),
                     )
                 }
             }

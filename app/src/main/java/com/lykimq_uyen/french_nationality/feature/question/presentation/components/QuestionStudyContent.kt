@@ -29,8 +29,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -64,14 +64,9 @@ fun QuestionStudyContent(
     modifier: Modifier = Modifier,
 ) {
     val visual = categoryVisual(category.iconKey)
-    val scrollState = rememberScrollState()
     var showJumpSheet by remember { mutableStateOf(false) }
     val chunks = remember(totalQuestions) {
         buildJumpChunks(totalQuestions)
-    }
-
-    LaunchedEffect(currentItem.number) {
-        scrollState.scrollTo(0)
     }
 
     AppGradientBackground(modifier = modifier) {
@@ -99,32 +94,35 @@ fun QuestionStudyContent(
                 )
             },
         ) { innerPadding ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-                    .horizontalSwipeNavigation(
-                        onSwipeNext = onNextClick,
-                        onSwipePrevious = onPreviousClick,
-                        canSwipeNext = canGoNext,
-                        canSwipePrevious = canGoPrevious,
+            key(currentItem.question.id) {
+                val scrollState = rememberScrollState()
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                        .horizontalSwipeNavigation(
+                            onSwipeNext = onNextClick,
+                            onSwipePrevious = onPreviousClick,
+                            canSwipeNext = canGoNext,
+                            canSwipePrevious = canGoPrevious,
+                        )
+                        .verticalScroll(scrollState)
+                        .padding(horizontal = 20.dp, vertical = 12.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    QuestionNumberBadge(
+                        number = currentItem.number,
+                        visual = visual,
                     )
-                    .verticalScroll(scrollState)
-                    .padding(horizontal = 20.dp, vertical = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-            ) {
-                QuestionNumberBadge(
-                    number = currentItem.number,
-                    visual = visual,
-                )
-                StudyTextCard(
-                    title = "Question",
-                    body = currentItem.question.question,
-                )
-                StudyTextCard(
-                    title = "Explication",
-                    body = currentItem.question.explanation,
-                )
+                    StudyTextCard(
+                        title = "Question",
+                        body = currentItem.question.question,
+                    )
+                    StudyTextCard(
+                        title = "Explication",
+                        body = currentItem.question.explanation,
+                    )
+                }
             }
         }
     }
