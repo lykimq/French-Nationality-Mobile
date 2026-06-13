@@ -3,10 +3,14 @@ package com.lykimq_uyen.french_nationality.feature.question.presentation
 import android.app.Application
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.lykimq_uyen.french_nationality.core.ui.components.AppGradientBackground
 import com.lykimq_uyen.french_nationality.core.ui.components.ErrorContent
@@ -32,6 +36,19 @@ fun QuestionListScreen(
         ),
     )
     val uiState by viewModel.uiState.collectAsState()
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.refreshProgress()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
 
     QuestionListScreenContent(
         uiState = uiState,
@@ -68,7 +85,6 @@ private fun QuestionListScreenContent(
                 isLargeList = uiState.isLargeList,
                 onBackClick = onBackClick,
                 onQuestionClick = onQuestionClick,
-                onResumeClick = onQuestionClick,
                 onJumpToNumber = { number ->
                     uiState.items.findByNumber(number)?.let(onQuestionClick)
                 },

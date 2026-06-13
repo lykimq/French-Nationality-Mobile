@@ -15,7 +15,6 @@ import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -41,7 +40,6 @@ import com.lykimq_uyen.french_nationality.feature.question.domain.model.Question
 import com.lykimq_uyen.french_nationality.feature.question.domain.model.chunkIndexForQuestionNumber
 import com.lykimq_uyen.french_nationality.feature.question.domain.model.findByQuestionId
 import com.lykimq_uyen.french_nationality.feature.subcategory.domain.model.SubCategory
-import com.lykimq_uyen.french_nationality.ui.theme.ElectricIndigo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,32 +52,22 @@ fun QuestionListContent(
     isLargeList: Boolean,
     onBackClick: () -> Unit,
     onQuestionClick: (QuestionListItem) -> Unit,
-    onResumeClick: (QuestionListItem) -> Unit,
     onJumpToNumber: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val visual = categoryVisual(category.iconKey)
     val listState = rememberLazyListState()
     var showJumpSheet by remember { mutableStateOf(false) }
-    val resumeItem = remember(lastQuestionId, items) {
-        lastQuestionId?.let { items.findByQuestionId(it) }
-    }
-    val progress = remember(resumeItem, items) {
-        if (items.isEmpty()) {
-            0f
-        } else {
-            (resumeItem?.number ?: 0).toFloat() / items.size.toFloat()
+    var selectedChunkIndex by remember(chunks) { mutableIntStateOf(0) }
+
+    LaunchedEffect(lastQuestionId, isLargeList, chunks, items) {
+        if (isLargeList && lastQuestionId != null) {
+            items.findByQuestionId(lastQuestionId)?.let { item ->
+                selectedChunkIndex = chunkIndexForQuestionNumber(chunks, item.number)
+            }
         }
     }
-    var selectedChunkIndex by remember(chunks, resumeItem) {
-        mutableIntStateOf(
-            if (isLargeList && resumeItem != null) {
-                chunkIndexForQuestionNumber(chunks, resumeItem.number)
-            } else {
-                0
-            },
-        )
-    }
+
     val visibleItems = remember(isLargeList, items, chunks, selectedChunkIndex) {
         if (isLargeList && chunks.isNotEmpty()) {
             chunks[selectedChunkIndex.coerceIn(0, chunks.lastIndex)].items
@@ -118,24 +106,6 @@ fun QuestionListContent(
                 ),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                item(key = "progress") {
-                    StudyProgressHeader(
-                        currentNumber = resumeItem?.number ?: 0,
-                        totalQuestions = items.size,
-                        progress = progress,
-                    )
-                }
-
-                if (resumeItem != null) {
-                    item(key = "resume") {
-                        ResumeStudyCard(
-                            questionNumber = resumeItem.number,
-                            visual = visual,
-                            onClick = { onResumeClick(resumeItem) },
-                        )
-                    }
-                }
-
                 item(key = "section_header") {
                     QuestionListSectionHeader(
                         totalQuestions = items.size,
@@ -243,34 +213,6 @@ private fun QuestionListTopBar(
 }
 
 @Composable
-private fun StudyProgressHeader(
-    currentNumber: Int,
-    totalQuestions: Int,
-    progress: Float,
-    modifier: Modifier = Modifier,
-) {
-    Column(modifier = modifier.fillMaxWidth()) {
-        Text(
-            text = if (currentNumber > 0) {
-                "Progression : question $currentNumber / $totalQuestions"
-            } else {
-                "$totalQuestions questions à parcourir"
-            },
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        LinearProgressIndicator(
-            progress = { progress.coerceIn(0f, 1f) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 10.dp),
-            color = ElectricIndigo,
-            trackColor = ElectricIndigo.copy(alpha = 0.18f),
-        )
-    }
-}
-
-@Composable
 private fun QuestionListSectionHeader(
     totalQuestions: Int,
     isLargeList: Boolean,
@@ -284,9 +226,9 @@ private fun QuestionListSectionHeader(
         )
         Text(
             text = if (isLargeList) {
-                "$totalQuestions questions en blocs de 25. Affiche un bloc, puis passe au suivant."
+                "$totalQuestions questions en blocs de 25. Utilise les flèches ou « Aller à # »."
             } else {
-                "Choisis une question pour commencer ou reprendre."
+                "$totalQuestions questions. Choisis-en une pour commencer."
             },
             modifier = Modifier.padding(top = 8.dp),
             style = MaterialTheme.typography.bodyMedium,

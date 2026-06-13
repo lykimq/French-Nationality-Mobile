@@ -55,6 +55,22 @@ fun List<QuestionListItem>.findByQuestionId(questionId: String): QuestionListIte
     return firstOrNull { it.question.id == questionId }
 }
 
+fun resolveSavedQuestionId(
+    items: List<QuestionListItem>,
+    savedQuestionId: String?,
+    onInvalidSavedId: (() -> Unit)? = null,
+): String? {
+    if (savedQuestionId == null) {
+        return null
+    }
+    return if (items.any { it.question.id == savedQuestionId }) {
+        savedQuestionId
+    } else {
+        onInvalidSavedId?.invoke()
+        null
+    }
+}
+
 fun buildJumpChunks(
     totalQuestions: Int,
     chunkSize: Int = QuestionListConfig.CHUNK_SIZE,

@@ -19,6 +19,12 @@ class StudyProgressRepositoryImpl(
             .apply()
     }
 
+    override fun clearLastQuestionId(subCategoryId: String) {
+        preferences.edit()
+            .remove(preferenceKey(subCategoryId))
+            .apply()
+    }
+
     private fun preferenceKey(subCategoryId: String): String {
         return "$KEY_PREFIX$subCategoryId"
     }

@@ -4,4 +4,6 @@ interface StudyProgressRepository {
     fun getLastQuestionId(subCategoryId: String): String?
 
     fun saveLastQuestionId(subCategoryId: String, questionId: String)
+
+    fun clearLastQuestionId(subCategoryId: String)
 }

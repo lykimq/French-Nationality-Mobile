@@ -6,13 +6,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.lykimq_uyen.french_nationality.core.di.AppContainer
+import com.lykimq_uyen.french_nationality.core.progress.StudyProgressRepository
 import com.lykimq_uyen.french_nationality.feature.home.domain.repository.CategoryRepository
 import com.lykimq_uyen.french_nationality.feature.question.domain.model.QuestionListConfig
+import com.lykimq_uyen.french_nationality.feature.question.domain.model.QuestionListItem
+import com.lykimq_uyen.french_nationality.feature.question.domain.model.resolveSavedQuestionId
 import com.lykimq_uyen.french_nationality.feature.question.domain.model.toChunks
 import com.lykimq_uyen.french_nationality.feature.question.domain.model.toNumberedItems
 import com.lykimq_uyen.french_nationality.feature.question.domain.repository.QuestionRepository
 import com.lykimq_uyen.french_nationality.feature.subcategory.domain.repository.SubCategoryRepository
-import com.lykimq_uyen.french_nationality.core.progress.StudyProgressRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -40,6 +42,14 @@ class QuestionListViewModel(
         loadQuestions()
     }
 
+    fun refreshProgress() {
+        val currentState = _uiState.value as? QuestionListUiState.Success ?: return
+        val lastQuestionId = readValidatedLastQuestionId(currentState.items)
+        if (lastQuestionId != currentState.lastQuestionId) {
+            _uiState.value = currentState.copy(lastQuestionId = lastQuestionId)
+        }
+    }
+
     fun loadQuestions() {
         viewModelScope.launch {
             _uiState.value = QuestionListUiState.Loading
@@ -60,7 +70,7 @@ class QuestionListViewModel(
                     subCategory = subCategory,
                     items = items,
                     chunks = chunks,
-                    lastQuestionId = studyProgressRepository.getLastQuestionId(subCategoryId),
+                    lastQuestionId = readValidatedLastQuestionId(items),
                     isLargeList = isLargeList,
                 )
             }.fold(
@@ -68,6 +78,16 @@ class QuestionListViewModel(
                 onFailure = { QuestionListUiState.Error(it.message ?: "Erreur inconnue") },
             )
         }
+    }
+
+    private fun readValidatedLastQuestionId(items: List<QuestionListItem>): String? {
+        return resolveSavedQuestionId(
+            items = items,
+            savedQuestionId = studyProgressRepository.getLastQuestionId(subCategoryId),
+            onInvalidSavedId = {
+                studyProgressRepository.clearLastQuestionId(subCategoryId)
+            },
+        )
     }
 }
 
