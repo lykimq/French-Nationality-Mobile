@@ -2,25 +2,32 @@ package com.lykimq_uyen.french_nationality.core.speech
 
 import android.speech.tts.Voice
 
-data class FrenchVoiceOption(
-    val id: String,
-    val label: String,
-    val gender: VoiceGender?,
-)
-
-internal fun buildFrenchVoiceOptions(voices: List<Voice>): List<FrenchVoiceOption> {
-    return voices.map { voice ->
-        FrenchVoiceOption(
-            id = voice.name,
-            label = formatVoiceLabel(voice.name),
-            gender = FrenchVoiceSelector.classifyVoiceGender(voice),
-        )
+internal fun formatActiveVoiceDescription(voice: Voice): String {
+    val label = formatVoiceLabel(voice)
+    val subtitle = formatVoiceSubtitle(voice)
+    return if (subtitle.isNullOrBlank()) {
+        label
+    } else {
+        "$label · $subtitle"
     }
 }
 
-internal fun formatVoiceLabel(voiceName: String): String {
+internal fun formatVoiceLabel(voice: Voice): String {
+    val name = voice.name.lowercase()
+    val friendlyName = when {
+        name.contains("frb") -> "Bernard"
+        name.contains("frg") -> "Guy"
+        name.contains("frd") -> "Denise"
+        name.contains("frc") -> "Caroline"
+        name.contains("fre") -> "Eva"
+        else -> null
+    }
+    if (friendlyName != null) {
+        return friendlyName
+    }
+
     val hashMatch = Regex("""#((?:female|male)(?:_\d+)?)""", RegexOption.IGNORE_CASE)
-        .find(voiceName)
+        .find(voice.name)
     if (hashMatch != null) {
         return hashMatch.groupValues[1]
             .replace("_", " ")
@@ -28,10 +35,18 @@ internal fun formatVoiceLabel(voiceName: String): String {
     }
 
     val googleMatch = Regex("""[-.#](fr[bcdegmr])(?:[-.#]|$)""", RegexOption.IGNORE_CASE)
-        .find(voiceName.lowercase())
+        .find(name)
     if (googleMatch != null) {
         return "Voix ${googleMatch.groupValues[1]}"
     }
 
-    return voiceName.substringAfterLast("-").ifBlank { voiceName }
+    return voice.name.substringAfterLast("-").ifBlank { voice.name }
+}
+
+internal fun formatVoiceSubtitle(voice: Voice): String? {
+    return when {
+        voice.isNetworkConnectionRequired -> "En ligne, plus naturelle"
+        voice.name.lowercase().endsWith("-local") -> "Hors ligne"
+        else -> null
+    }
 }

@@ -3,6 +3,9 @@ package com.lykimq_uyen.french_nationality.core.di
 import android.content.Context
 import com.lykimq_uyen.french_nationality.core.progress.StudyProgressRepository
 import com.lykimq_uyen.french_nationality.core.progress.StudyProgressRepositoryImpl
+import com.lykimq_uyen.french_nationality.core.settings.AppPreferencesRepository
+import com.lykimq_uyen.french_nationality.core.settings.AppPreferencesRepositoryImpl
+import com.lykimq_uyen.french_nationality.core.settings.AppThemeController
 import com.lykimq_uyen.french_nationality.core.speech.FrenchSpeechController
 import com.lykimq_uyen.french_nationality.core.speech.SpeechPreferencesRepository
 import com.lykimq_uyen.french_nationality.core.speech.SpeechPreferencesRepositoryImpl
@@ -37,6 +40,25 @@ object AppContainer {
 
     fun speechPreferencesRepository(context: Context): SpeechPreferencesRepository {
         return SpeechPreferencesRepositoryImpl(context)
+    }
+
+    fun appPreferencesRepository(context: Context): AppPreferencesRepository {
+        return AppPreferencesRepositoryImpl(context)
+    }
+
+    @Volatile
+    private var appThemeController: AppThemeController? = null
+
+    fun appThemeController(context: Context): AppThemeController {
+        val existing = appThemeController
+        if (existing != null) {
+            return existing
+        }
+        return synchronized(this) {
+            appThemeController ?: AppThemeController(
+                appPreferencesRepository = appPreferencesRepository(context),
+            ).also { appThemeController = it }
+        }
     }
 
     @Volatile

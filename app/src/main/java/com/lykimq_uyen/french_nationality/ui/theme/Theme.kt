@@ -5,7 +5,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import com.lykimq_uyen.french_nationality.core.settings.ThemeMode
 import com.lykimq_uyen.french_nationality.core.ui.SystemBarsEffect
 
 private val LightColors = lightColorScheme(
@@ -48,20 +51,35 @@ private val DarkColors = darkColorScheme(
     outline = Color(0xFF475569),
 )
 
+val LocalThemeMode = staticCompositionLocalOf { ThemeMode.SYSTEM }
+
 @Composable
 fun FrenchNationalityTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    themeMode: ThemeMode = ThemeMode.SYSTEM,
     content: @Composable () -> Unit,
 ) {
-    SystemBarsEffect(darkTheme = darkTheme)
+    val darkTheme = resolveDarkTheme(themeMode)
 
-    MaterialTheme(
-        colorScheme = if (darkTheme) DarkColors else LightColors,
-        typography = AppTypography,
-        shapes = AppShapes,
-        content = content,
-    )
+    CompositionLocalProvider(LocalThemeMode provides themeMode) {
+        SystemBarsEffect(darkTheme = darkTheme)
+
+        MaterialTheme(
+            colorScheme = if (darkTheme) DarkColors else LightColors,
+            typography = AppTypography,
+            shapes = AppShapes,
+            content = content,
+        )
+    }
 }
 
 @Composable
-fun isDarkTheme(): Boolean = isSystemInDarkTheme()
+fun isDarkTheme(): Boolean = resolveDarkTheme(LocalThemeMode.current)
+
+@Composable
+private fun resolveDarkTheme(themeMode: ThemeMode): Boolean {
+    return when (themeMode) {
+        ThemeMode.SYSTEM -> isSystemInDarkTheme()
+        ThemeMode.LIGHT -> false
+        ThemeMode.DARK -> true
+    }
+}

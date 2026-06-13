@@ -22,27 +22,8 @@ class SpeechPreferencesRepositoryImpl(
             .apply()
     }
 
-    override fun getSavedVoiceName(gender: VoiceGender): String? {
-        return preferences.getString(voiceNameKey(gender), null)
-    }
-
-    override fun saveVoiceName(gender: VoiceGender, voiceName: String) {
-        preferences.edit()
-            .putString(voiceNameKey(gender), voiceName)
-            .apply()
-    }
-
-    private fun voiceNameKey(gender: VoiceGender): String {
-        return when (gender) {
-            VoiceGender.MALE -> KEY_MALE_VOICE_NAME
-            VoiceGender.FEMALE -> KEY_FEMALE_VOICE_NAME
-        }
-    }
-
     companion object {
         private const val PREFS_NAME = "speech_preferences"
         private const val KEY_VOICE_GENDER = "voice_gender"
-        private const val KEY_MALE_VOICE_NAME = "male_voice_name"
-        private const val KEY_FEMALE_VOICE_NAME = "female_voice_name"
     }
 }

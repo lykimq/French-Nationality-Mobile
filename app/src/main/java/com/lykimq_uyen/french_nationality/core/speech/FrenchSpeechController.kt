@@ -28,14 +28,11 @@ class FrenchSpeechController(
     private val _voiceGender = MutableStateFlow(speechPreferencesRepository.getVoiceGender())
     val voiceGender: StateFlow<VoiceGender> = _voiceGender.asStateFlow()
 
-    private val _activeVoiceName = MutableStateFlow<String?>(null)
-    val activeVoiceName: StateFlow<String?> = _activeVoiceName.asStateFlow()
+    private val _activeVoiceLabel = MutableStateFlow<String?>(null)
+    val activeVoiceLabel: StateFlow<String?> = _activeVoiceLabel.asStateFlow()
 
     private val _isGenderVoiceAvailable = MutableStateFlow(true)
     val isGenderVoiceAvailable: StateFlow<Boolean> = _isGenderVoiceAvailable.asStateFlow()
-
-    private val _frenchVoiceOptions = MutableStateFlow<List<FrenchVoiceOption>>(emptyList())
-    val frenchVoiceOptions: StateFlow<List<FrenchVoiceOption>> = _frenchVoiceOptions.asStateFlow()
 
     private val _isSpeaking = MutableStateFlow(false)
     val isSpeaking: StateFlow<Boolean> = _isSpeaking.asStateFlow()
@@ -54,7 +51,7 @@ class FrenchSpeechController(
                 _isReady.value = false
                 return@TextToSpeech
             }
-            engine.setSpeechRate(0.95f)
+            engine.setSpeechRate(DEFAULT_SPEECH_RATE)
             engine.setOnUtteranceProgressListener(
                 object : UtteranceProgressListener() {
                     override fun onStart(utteranceId: String?) {
@@ -87,21 +84,6 @@ class FrenchSpeechController(
         if (isInitialized.get()) {
             scheduleApplyVoiceGender(gender, attempt = 0)
         }
-    }
-
-    fun selectVoiceByName(voiceName: String) {
-        val engine = textToSpeech ?: return
-        val voice = getFrenchVoices().firstOrNull { it.name == voiceName } ?: return
-        val gender = _voiceGender.value
-        engine.voice = voice
-        speechPreferencesRepository.saveVoiceName(gender, voice.name)
-        _activeVoiceName.value = voice.name
-        _isGenderVoiceAvailable.value = FrenchVoiceSelector.matchesGender(voice, gender) ||
-            FrenchVoiceSelector.classifyVoiceGender(voice) == null
-    }
-
-    fun refreshVoiceOptions() {
-        _frenchVoiceOptions.value = buildFrenchVoiceOptions(getFrenchVoices())
     }
 
     fun speak(text: String) {
@@ -147,27 +129,26 @@ class FrenchSpeechController(
     private fun applyVoiceGender(gender: VoiceGender): Boolean {
         val engine = textToSpeech ?: return false
         val frenchVoices = getFrenchVoices()
-        val preferredVoiceName = speechPreferencesRepository.getSavedVoiceName(gender)
         val selectedVoice = FrenchVoiceSelector.selectVoice(
             voices = frenchVoices,
             gender = gender,
-            preferredVoiceName = preferredVoiceName,
         )
 
-        _isGenderVoiceAvailable.value = FrenchVoiceSelector.hasVoiceForGender(
-            voices = frenchVoices,
-            gender = gender,
-        )
-        _frenchVoiceOptions.value = buildFrenchVoiceOptions(frenchVoices)
+        _isGenderVoiceAvailable.value = when (gender) {
+            VoiceGender.MALE -> FrenchVoiceSelector.selectOnlineMaleVoice(frenchVoices) != null
+            VoiceGender.FEMALE -> FrenchVoiceSelector.selectOnlineFemaleVoice(frenchVoices) != null
+        }
 
-        if (selectedVoice == null) {
-            _activeVoiceName.value = engine.voice?.name
+        if (selectedVoice == null ||
+            (gender == VoiceGender.FEMALE &&
+                FrenchVoiceSelector.classifyVoiceGender(selectedVoice) == VoiceGender.MALE)
+        ) {
+            _activeVoiceLabel.value = engine.voice?.let(::formatActiveVoiceDescription)
             return false
         }
 
         engine.voice = selectedVoice
-        speechPreferencesRepository.saveVoiceName(gender, selectedVoice.name)
-        _activeVoiceName.value = selectedVoice.name
+        _activeVoiceLabel.value = formatActiveVoiceDescription(selectedVoice)
         return true
     }
 
@@ -175,10 +156,6 @@ class FrenchSpeechController(
         val engine = textToSpeech ?: return emptyList()
         return engine.voices
             ?.filter { voice -> voice.locale.language.equals("fr", ignoreCase = true) }
-            ?.sortedWith(
-                compareByDescending<Voice> { !it.isNetworkConnectionRequired }
-                    .thenByDescending { it.quality },
-            )
             .orEmpty()
     }
 
@@ -186,5 +163,6 @@ class FrenchSpeechController(
         private const val UTTERANCE_ID = "french_speech_utterance"
         private const val VOICE_APPLY_MAX_ATTEMPTS = 8
         private const val VOICE_APPLY_RETRY_DELAY_MS = 250L
+        private const val DEFAULT_SPEECH_RATE = 0.95f
     }
 }
