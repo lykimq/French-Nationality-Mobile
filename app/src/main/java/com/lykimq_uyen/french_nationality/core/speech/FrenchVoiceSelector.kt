@@ -153,10 +153,6 @@ internal object FrenchVoiceSelector {
         return null
     }
 
-    fun hasVoiceForGender(voices: List<Voice>, gender: VoiceGender): Boolean {
-        return voices.any { voice -> matchesGender(voice, gender) }
-    }
-
     fun naturalnessScore(voice: Voice, gender: VoiceGender): Int {
         val name = voice.name.lowercase(Locale.ROOT)
         var score = voice.quality * 10

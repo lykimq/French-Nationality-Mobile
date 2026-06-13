@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.speech.tts.TextToSpeech
-import android.speech.tts.UtteranceProgressListener
 import android.speech.tts.Voice
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,15 +27,6 @@ class FrenchSpeechController(
     private val _voiceGender = MutableStateFlow(speechPreferencesRepository.getVoiceGender())
     val voiceGender: StateFlow<VoiceGender> = _voiceGender.asStateFlow()
 
-    private val _activeVoiceLabel = MutableStateFlow<String?>(null)
-    val activeVoiceLabel: StateFlow<String?> = _activeVoiceLabel.asStateFlow()
-
-    private val _isGenderVoiceAvailable = MutableStateFlow(true)
-    val isGenderVoiceAvailable: StateFlow<Boolean> = _isGenderVoiceAvailable.asStateFlow()
-
-    private val _isSpeaking = MutableStateFlow(false)
-    val isSpeaking: StateFlow<Boolean> = _isSpeaking.asStateFlow()
-
     init {
         textToSpeech = TextToSpeech(appContext) { status ->
             if (status != TextToSpeech.SUCCESS) {
@@ -52,26 +42,6 @@ class FrenchSpeechController(
                 return@TextToSpeech
             }
             engine.setSpeechRate(DEFAULT_SPEECH_RATE)
-            engine.setOnUtteranceProgressListener(
-                object : UtteranceProgressListener() {
-                    override fun onStart(utteranceId: String?) {
-                        _isSpeaking.value = true
-                    }
-
-                    override fun onDone(utteranceId: String?) {
-                        _isSpeaking.value = false
-                    }
-
-                    @Deprecated("Deprecated in Java")
-                    override fun onError(utteranceId: String?) {
-                        _isSpeaking.value = false
-                    }
-
-                    override fun onError(utteranceId: String?, errorCode: Int) {
-                        _isSpeaking.value = false
-                    }
-                },
-            )
             isInitialized.set(true)
             scheduleApplyVoiceGender(_voiceGender.value, attempt = 0)
             _isReady.value = true
@@ -101,17 +71,6 @@ class FrenchSpeechController(
 
     fun stop() {
         textToSpeech?.stop()
-        _isSpeaking.value = false
-    }
-
-    fun shutdown() {
-        mainHandler.removeCallbacksAndMessages(null)
-        textToSpeech?.stop()
-        textToSpeech?.shutdown()
-        textToSpeech = null
-        isInitialized.set(false)
-        _isReady.value = false
-        _isSpeaking.value = false
     }
 
     private fun scheduleApplyVoiceGender(gender: VoiceGender, attempt: Int) {
@@ -134,21 +93,14 @@ class FrenchSpeechController(
             gender = gender,
         )
 
-        _isGenderVoiceAvailable.value = when (gender) {
-            VoiceGender.MALE -> FrenchVoiceSelector.selectOnlineMaleVoice(frenchVoices) != null
-            VoiceGender.FEMALE -> FrenchVoiceSelector.selectOnlineFemaleVoice(frenchVoices) != null
-        }
-
         if (selectedVoice == null ||
             (gender == VoiceGender.FEMALE &&
                 FrenchVoiceSelector.classifyVoiceGender(selectedVoice) == VoiceGender.MALE)
         ) {
-            _activeVoiceLabel.value = engine.voice?.let(::formatActiveVoiceDescription)
             return false
         }
 
         engine.voice = selectedVoice
-        _activeVoiceLabel.value = formatActiveVoiceDescription(selectedVoice)
         return true
     }
 

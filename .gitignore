@@ -17,3 +17,8 @@ captures/
 
 # Generated (keep Room schemas)
 !app/schemas/
+
+# Release signing (local only, never commit)
+release-keystore.jks
+keystore.properties
+French-Nationality-*-release.apk

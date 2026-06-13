@@ -38,11 +38,11 @@ object AppContainer {
         return StudyProgressRepositoryImpl(context)
     }
 
-    fun speechPreferencesRepository(context: Context): SpeechPreferencesRepository {
+    private fun speechPreferencesRepository(context: Context): SpeechPreferencesRepository {
         return SpeechPreferencesRepositoryImpl(context)
     }
 
-    fun appPreferencesRepository(context: Context): AppPreferencesRepository {
+    private fun appPreferencesRepository(context: Context): AppPreferencesRepository {
         return AppPreferencesRepositoryImpl(context)
     }
 

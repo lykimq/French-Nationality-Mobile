@@ -1,4 +1,4 @@
-.PHONY: install dev apk clean test check-device
+.PHONY: install dev apk release-apk install-release clean test check-device
 
 PACKAGE  := com.lykimq_uyen.french_nationality
 ACTIVITY := $(PACKAGE)/.MainActivity
@@ -38,6 +38,16 @@ dev: check-device
 apk:
 	$(GRADLE) assembleDebug
 	@echo "APK: app/build/outputs/apk/debug/app-debug.apk"
+
+release-apk:
+	@test -f keystore.properties || (echo "Missing keystore.properties. Release signing is not configured."; exit 1)
+	$(GRADLE) assembleRelease
+	@echo "APK: app/build/outputs/apk/release/app-release.apk"
+
+install-release: check-device
+	@test -f keystore.properties || (echo "Missing keystore.properties. Release signing is not configured."; exit 1)
+	ANDROID_SERIAL=$(ADB_DEVICE) $(GRADLE) installRelease
+	$(ADB) shell am start -n $(ACTIVITY)
 
 clean:
 	$(GRADLE) clean
