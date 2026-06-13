@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "0246cb9ae5668c572e4b8babdcb8a728",
+    "identityHash": "81666d9763b6c2328abf77b333615a90",
     "entities": [
       {
         "tableName": "categories",
@@ -88,7 +88,7 @@
       },
       {
         "tableName": "questions",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `category_id` TEXT NOT NULL, `sub_category_id` TEXT NOT NULL, `question` TEXT NOT NULL, `explanation` TEXT NOT NULL, `image_path` TEXT, `source` TEXT NOT NULL, `question_type` TEXT, `sort_order` INTEGER NOT NULL, `content_fingerprint` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `category_id` TEXT NOT NULL, `sub_category_id` TEXT NOT NULL, `question` TEXT NOT NULL, `explanation` TEXT NOT NULL, `image_path` TEXT, `question_type` TEXT, `sort_order` INTEGER NOT NULL, `content_fingerprint` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -127,12 +127,6 @@
             "notNull": false
           },
           {
-            "fieldPath": "source",
-            "columnName": "source",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
             "fieldPath": "question_type",
             "columnName": "question_type",
             "affinity": "TEXT",
@@ -162,11 +156,10 @@
             "name": "idx_questions_category",
             "unique": false,
             "columnNames": [
-              "category_id",
-              "source"
+              "category_id"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `idx_questions_category` ON `${TABLE_NAME}` (`category_id`, `source`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `idx_questions_category` ON `${TABLE_NAME}` (`category_id`)"
           },
           {
             "name": "idx_questions_sub_category",
@@ -185,54 +178,6 @@
             ],
             "orders": [],
             "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `idx_questions_fingerprint` ON `${TABLE_NAME}` (`content_fingerprint`)"
-          }
-        ],
-        "foreignKeys": []
-      },
-      {
-        "tableName": "answers",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `question_id` TEXT NOT NULL, `text` TEXT NOT NULL, `is_correct` INTEGER NOT NULL)",
-        "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "question_id",
-            "columnName": "question_id",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "text",
-            "columnName": "text",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "is_correct",
-            "columnName": "is_correct",
-            "affinity": "INTEGER",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": true,
-          "columnNames": [
-            "id"
-          ]
-        },
-        "indices": [
-          {
-            "name": "idx_answers_question",
-            "unique": false,
-            "columnNames": [
-              "question_id"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `idx_answers_question` ON `${TABLE_NAME}` (`question_id`)"
           }
         ],
         "foreignKeys": []
@@ -267,7 +212,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0246cb9ae5668c572e4b8babdcb8a728')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '81666d9763b6c2328abf77b333615a90')"
     ]
   }
 }

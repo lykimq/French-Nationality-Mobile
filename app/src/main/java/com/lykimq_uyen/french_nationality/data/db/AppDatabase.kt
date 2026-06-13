@@ -8,7 +8,6 @@ import com.lykimq_uyen.french_nationality.data.db.dao.CategoryDao
 import com.lykimq_uyen.french_nationality.data.db.dao.DbMetaDao
 import com.lykimq_uyen.french_nationality.data.db.dao.QuestionDao
 import com.lykimq_uyen.french_nationality.data.db.dao.SubCategoryDao
-import com.lykimq_uyen.french_nationality.data.db.entity.AnswerEntity
 import com.lykimq_uyen.french_nationality.data.db.entity.CategoryEntity
 import com.lykimq_uyen.french_nationality.data.db.entity.DbMetaEntity
 import com.lykimq_uyen.french_nationality.data.db.entity.QuestionEntity
@@ -19,7 +18,6 @@ import com.lykimq_uyen.french_nationality.data.db.entity.SubCategoryEntity
         CategoryEntity::class,
         SubCategoryEntity::class,
         QuestionEntity::class,
-        AnswerEntity::class,
         DbMetaEntity::class,
     ],
     version = 1,
