@@ -5,7 +5,6 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.lykimq_uyen.french_nationality.data.db.dao.CategoryDao
-import com.lykimq_uyen.french_nationality.data.db.dao.DbMetaDao
 import com.lykimq_uyen.french_nationality.data.db.dao.QuestionDao
 import com.lykimq_uyen.french_nationality.data.db.dao.SubCategoryDao
 import com.lykimq_uyen.french_nationality.data.db.entity.CategoryEntity
@@ -27,7 +26,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun categoryDao(): CategoryDao
     abstract fun subCategoryDao(): SubCategoryDao
     abstract fun questionDao(): QuestionDao
-    abstract fun dbMetaDao(): DbMetaDao
 
     companion object {
         private const val DB_NAME = "french_questions.db"

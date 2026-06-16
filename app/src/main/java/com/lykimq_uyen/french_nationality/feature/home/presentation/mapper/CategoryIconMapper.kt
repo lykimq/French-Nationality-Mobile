@@ -44,7 +44,7 @@ fun categoryVisual(iconKey: String): CategoryVisual {
     )
 }
 
-fun categoryIcon(iconKey: String): ImageVector {
+private fun categoryIcon(iconKey: String): ImageVector {
     return when (iconKey) {
         "flag" -> Icons.Outlined.Flag
         "institution" -> Icons.Outlined.AccountBalance

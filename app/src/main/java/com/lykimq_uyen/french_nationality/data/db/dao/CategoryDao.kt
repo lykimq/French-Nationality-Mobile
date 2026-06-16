@@ -11,7 +11,4 @@ interface CategoryDao {
 
     @Query("SELECT * FROM categories WHERE id = :categoryId LIMIT 1")
     suspend fun getCategoryById(categoryId: String): CategoryEntity?
-
-    @Query("SELECT COUNT(*) FROM categories")
-    suspend fun getCategoryCount(): Int
 }

@@ -22,3 +22,4 @@ captures/
 release-keystore.jks
 keystore.properties
 French-Nationality-*-release.apk
+*.db.bak

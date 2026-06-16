@@ -6,7 +6,6 @@ import com.lykimq_uyen.french_nationality.feature.subcategory.domain.model.SubCa
 fun SubCategoryEntity.toSubCategory(questionCount: Int): SubCategory {
     return SubCategory(
         id = id,
-        categoryId = category_id,
         title = title,
         questionCount = questionCount,
     )

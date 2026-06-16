@@ -30,7 +30,7 @@ class SubCategoryViewModel(
         loadSubCategories()
     }
 
-    fun loadSubCategories() {
+    private fun loadSubCategories() {
         viewModelScope.launch {
             _uiState.value = SubCategoryUiState.Loading
             _uiState.value = runCatching {

@@ -12,9 +12,6 @@ interface SubCategoryDao {
     @Query("SELECT * FROM sub_categories WHERE id = :subCategoryId LIMIT 1")
     suspend fun getById(subCategoryId: String): SubCategoryEntity?
 
-    @Query("SELECT COUNT(*) FROM sub_categories WHERE category_id = :categoryId")
-    suspend fun getSubCategoryCount(categoryId: String): Int
-
     @Query(
         """
         SELECT COUNT(*) FROM questions

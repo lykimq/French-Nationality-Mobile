@@ -2,11 +2,8 @@ package com.lykimq_uyen.french_nationality.feature.question.domain.model
 
 data class Question(
     val id: String,
-    val subCategoryId: String,
-    val categoryId: String,
     val question: String,
     val explanation: String,
-    val sortOrder: Int,
 )
 
 data class QuestionListItem(

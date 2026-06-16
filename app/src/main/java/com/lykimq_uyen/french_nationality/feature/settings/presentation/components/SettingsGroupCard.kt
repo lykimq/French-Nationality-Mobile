@@ -34,7 +34,7 @@ fun SettingsGroupCard(
 }
 
 @Composable
-internal fun settingsCardColor(): Color {
+private fun settingsCardColor(): Color {
     return if (isDarkTheme()) {
         Color(0xFF252036).copy(alpha = 0.92f)
     } else {

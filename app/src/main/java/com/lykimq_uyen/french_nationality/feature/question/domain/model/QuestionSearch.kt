@@ -141,7 +141,7 @@ private fun classifySearchMatch(
     return null
 }
 
-internal fun normalizeSearchText(text: String): String {
+private fun normalizeSearchText(text: String): String {
     return removeAccents(text.trim().lowercase())
         .replace(Regex("\\s+"), " ")
 }

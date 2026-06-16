@@ -30,7 +30,7 @@ internal object FrenchVoiceSelector {
         }
     }
 
-    fun selectOnlineFemaleVoice(voices: List<Voice>): Voice? {
+    private fun selectOnlineFemaleVoice(voices: List<Voice>): Voice? {
         val carolineVoices = voices.filter { voice ->
             isCarolineVoice(voice) && classifyVoiceGender(voice) != VoiceGender.MALE
         }
@@ -61,13 +61,13 @@ internal object FrenchVoiceSelector {
         return sortByNaturalness(candidates, VoiceGender.FEMALE).firstOrNull()
     }
 
-    fun isCarolineVoice(voice: Voice): Boolean {
+    private fun isCarolineVoice(voice: Voice): Boolean {
         val name = voice.name.lowercase(Locale.ROOT)
         return carolineVoiceTokens.any { token -> name.contains(token) } ||
             name.contains("caroline")
     }
 
-    fun selectOnlineMaleVoice(voices: List<Voice>): Voice? {
+    private fun selectOnlineMaleVoice(voices: List<Voice>): Voice? {
         val maleVoices = voices.filter { voice -> matchesGender(voice, VoiceGender.MALE) }
         if (maleVoices.isEmpty()) {
             return null
@@ -83,7 +83,7 @@ internal object FrenchVoiceSelector {
         return sortByNaturalness(candidates, VoiceGender.MALE).firstOrNull()
     }
 
-    fun sortByNaturalness(voices: List<Voice>, gender: VoiceGender): List<Voice> {
+    private fun sortByNaturalness(voices: List<Voice>, gender: VoiceGender): List<Voice> {
         return voices.sortedWith(
             compareByDescending<Voice> { naturalnessScore(it, gender) }
                 .thenByDescending { it.quality }
@@ -91,7 +91,7 @@ internal object FrenchVoiceSelector {
         )
     }
 
-    fun matchesGender(voice: Voice, gender: VoiceGender): Boolean {
+    private fun matchesGender(voice: Voice, gender: VoiceGender): Boolean {
         return classifyVoiceGender(voice) == gender
     }
 
@@ -153,7 +153,7 @@ internal object FrenchVoiceSelector {
         return null
     }
 
-    fun naturalnessScore(voice: Voice, gender: VoiceGender): Int {
+    private fun naturalnessScore(voice: Voice, gender: VoiceGender): Int {
         val name = voice.name.lowercase(Locale.ROOT)
         var score = voice.quality * 10
 

@@ -24,7 +24,7 @@ class HomeViewModel(
         loadCategories()
     }
 
-    fun loadCategories() {
+    private fun loadCategories() {
         viewModelScope.launch {
             _uiState.value = HomeUiState.Loading
             _uiState.value = runCatching { repository.getCategories() }

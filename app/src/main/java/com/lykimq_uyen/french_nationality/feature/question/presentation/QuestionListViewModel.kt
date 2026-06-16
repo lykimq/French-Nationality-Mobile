@@ -50,7 +50,7 @@ class QuestionListViewModel(
         }
     }
 
-    fun loadQuestions() {
+    private fun loadQuestions() {
         viewModelScope.launch {
             _uiState.value = QuestionListUiState.Loading
             _uiState.value = runCatching {
