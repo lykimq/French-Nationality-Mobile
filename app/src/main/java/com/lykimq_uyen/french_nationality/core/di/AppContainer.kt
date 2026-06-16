@@ -1,6 +1,7 @@
 package com.lykimq_uyen.french_nationality.core.di
 
 import android.content.Context
+import com.lykimq_uyen.french_nationality.core.billing.DonationBillingController
 import com.lykimq_uyen.french_nationality.core.progress.StudyProgressRepository
 import com.lykimq_uyen.french_nationality.core.progress.StudyProgressRepositoryImpl
 import com.lykimq_uyen.french_nationality.core.settings.AppPreferencesRepository
@@ -74,6 +75,21 @@ object AppContainer {
                 context = context,
                 speechPreferencesRepository = speechPreferencesRepository(context),
             ).also { speechController = it }
+        }
+    }
+
+    @Volatile
+    private var donationBillingController: DonationBillingController? = null
+
+    fun donationBillingController(context: Context): DonationBillingController {
+        val existing = donationBillingController
+        if (existing != null) {
+            return existing
+        }
+        return synchronized(this) {
+            donationBillingController ?: DonationBillingController(
+                context = context,
+            ).also { donationBillingController = it }
         }
     }
 }

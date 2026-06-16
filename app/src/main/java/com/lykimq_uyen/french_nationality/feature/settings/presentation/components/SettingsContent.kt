@@ -11,7 +11,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
+import androidx.compose.material.icons.outlined.Coffee
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
@@ -19,15 +22,21 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.lykimq_uyen.french_nationality.core.billing.DonationMessage
+import com.lykimq_uyen.french_nationality.core.billing.DonationUiState
 import com.lykimq_uyen.french_nationality.core.settings.ThemeMode
 import com.lykimq_uyen.french_nationality.core.speech.VoiceGender
 import com.lykimq_uyen.french_nationality.core.ui.components.AppGradientBackground
@@ -40,19 +49,43 @@ fun SettingsContent(
     isSpeechReady: Boolean,
     appVersionName: String,
     showResetProgressDialog: Boolean,
+    donationState: DonationUiState,
+    donationMessage: DonationMessage?,
     onVoiceGenderChange: (VoiceGender) -> Unit,
     onThemeModeChange: (ThemeMode) -> Unit,
     onTestVoiceClick: () -> Unit,
     onResetProgressClick: () -> Unit,
     onConfirmResetProgress: () -> Unit,
     onDismissResetProgressDialog: () -> Unit,
+    onDonateCoffeeClick: () -> Unit,
+    onDismissDonationMessage: () -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(donationMessage) {
+        when (val message = donationMessage) {
+            null -> Unit
+            DonationMessage.ThankYou -> {
+                snackbarHostState.showSnackbar("Merci pour ton soutien !")
+                onDismissDonationMessage()
+            }
+            DonationMessage.Cancelled -> {
+                onDismissDonationMessage()
+            }
+            is DonationMessage.Error -> {
+                snackbarHostState.showSnackbar(message.text)
+                onDismissDonationMessage()
+            }
+        }
+    }
+
     AppGradientBackground(modifier = modifier) {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             containerColor = Color.Transparent,
+            snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
             topBar = {
                 TopAppBar(
                     navigationIcon = {
@@ -138,6 +171,67 @@ fun SettingsContent(
                         modifier = Modifier.fillMaxWidth(),
                     ) {
                         Text("Réinitialiser la progression")
+                    }
+                }
+
+                SettingsSectionHeader(title = "Soutenir l'app")
+                SettingsGroupCard {
+                    Text(
+                        text = "Si cette app t'aide à préparer l'entretien, tu peux m'offrir un café.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    when (donationState) {
+                        DonationUiState.Loading -> {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 12.dp),
+                                horizontalArrangement = Arrangement.Center,
+                            ) {
+                                CircularProgressIndicator()
+                            }
+                        }
+                        DonationUiState.Unavailable -> {
+                            Text(
+                                text = "Les dons via Google Play seront disponibles après publication de l'app.",
+                                modifier = Modifier.padding(top = 12.dp),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        is DonationUiState.Ready -> {
+                            Button(
+                                onClick = onDonateCoffeeClick,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 12.dp),
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.Center,
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.Coffee,
+                                        contentDescription = null,
+                                    )
+                                    Text(
+                                        text = "Offrir un café (${donationState.product.formattedPrice})",
+                                        modifier = Modifier.padding(start = 8.dp),
+                                    )
+                                }
+                            }
+                        }
+                        DonationUiState.Processing -> {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 12.dp),
+                                horizontalArrangement = Arrangement.Center,
+                            ) {
+                                CircularProgressIndicator()
+                            }
+                        }
                     }
                 }
 

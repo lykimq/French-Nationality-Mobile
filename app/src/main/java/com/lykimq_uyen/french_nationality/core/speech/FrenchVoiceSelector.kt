@@ -46,7 +46,9 @@ internal object FrenchVoiceSelector {
             return sortByNaturalness(candidates, VoiceGender.FEMALE).firstOrNull()
         }
 
-        val femaleVoices = voices.filter { voice -> matchesGender(voice, VoiceGender.FEMALE) }
+        val femaleVoices = voices.filter { voice ->
+            classifyVoiceGender(voice) == VoiceGender.FEMALE
+        }
         if (femaleVoices.isEmpty()) {
             return null
         }
@@ -63,12 +65,13 @@ internal object FrenchVoiceSelector {
 
     private fun isCarolineVoice(voice: Voice): Boolean {
         val name = voice.name.lowercase(Locale.ROOT)
-        return carolineVoiceTokens.any { token -> name.contains(token) } ||
-            name.contains("caroline")
+        return carolineVoiceTokens.any { token -> name.contains(token) }
     }
 
     private fun selectOnlineMaleVoice(voices: List<Voice>): Voice? {
-        val maleVoices = voices.filter { voice -> matchesGender(voice, VoiceGender.MALE) }
+        val maleVoices = voices.filter { voice ->
+            classifyVoiceGender(voice) == VoiceGender.MALE
+        }
         if (maleVoices.isEmpty()) {
             return null
         }
@@ -89,10 +92,6 @@ internal object FrenchVoiceSelector {
                 .thenByDescending { it.quality }
                 .thenBy { it.name },
         )
-    }
-
-    private fun matchesGender(voice: Voice, gender: VoiceGender): Boolean {
-        return classifyVoiceGender(voice) == gender
     }
 
     fun classifyVoiceGender(voice: Voice): VoiceGender? {
@@ -129,25 +128,6 @@ internal object FrenchVoiceSelector {
         when {
             isGoogleFemaleCode(name) -> return VoiceGender.FEMALE
             isGoogleMaleCode(name) -> return VoiceGender.MALE
-        }
-
-        when {
-            name.contains("female") || name.contains("femme") || name.contains("woman") -> {
-                return VoiceGender.FEMALE
-            }
-            name.contains("male") || name.contains("homme") -> return VoiceGender.MALE
-        }
-
-        val femaleNames = listOf(
-            "claire", "julie", "amelie", "denise", "marie", "audrey", "celine", "caroline",
-        )
-        val maleNames = listOf(
-            "pierre", "henri", "thomas", "bernard", "guy", "jacques", "nicolas", "paul",
-        )
-
-        when {
-            femaleNames.any { hint -> name.contains(hint) } -> return VoiceGender.FEMALE
-            maleNames.any { hint -> name.contains(hint) } -> return VoiceGender.MALE
         }
 
         return null
